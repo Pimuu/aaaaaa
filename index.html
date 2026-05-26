@@ -29,20 +29,23 @@
 
     /* Shrinking button */
     #open-btn {
-      transition: font-size .3s ease, padding .3s ease, opacity .4s ease;
+      transition: transform .3s ease, opacity .4s ease;
       transform-origin: center;
+      display: inline-block;
     }
 
-    /* Hint */
+    /* Hint — hidden until JS adds .visible */
     #hint {
       font-family: 'Lato', sans-serif;
       font-size: .85rem;
       color: #c090a0;
+      visibility: hidden;
       opacity: 0;
       pointer-events: none;
       transition: opacity .8s ease;
     }
     #hint.visible {
+      visibility: visible;
       opacity: 1;
       pointer-events: auto;
     }
@@ -73,25 +76,27 @@
     const hint = document.getElementById('hint');
 
     let clicks    = 0;
-    const HINT_AT = 7;
-    const MAX     = 10;
+    const HINT_AT = 5;   // hint appears after this many clicks
+    const MAX     = 8;   // button fully disappears after this many clicks
 
     btn.addEventListener('click', () => {
       clicks++;
 
-      if (clicks >= MAX) {
-        btn.style.opacity      = '0';
-        btn.style.pointerEvents = 'none';
+      // Shrink by 20% each click using scale — button stays clickable throughout
+      const scale = Math.pow(0.80, clicks);
+      btn.style.transform = `scale(${scale})`;
+
+      // Show hint after HINT_AT clicks
+      if (clicks >= HINT_AT) {
         hint.classList.add('visible');
-        return;
       }
 
-      // shrink 14% per click
-      const f    = Math.pow(0.86, clicks);
-      btn.style.fontSize = (1.2 * f) + 'rem';
-      btn.style.padding  = (0.6 * f) + 'em ' + (2 * f) + 'em';
-
-      if (clicks >= HINT_AT) hint.classList.add('visible');
+      // Hide button completely after MAX clicks
+      if (clicks >= MAX) {
+        btn.style.opacity       = '0';
+        btn.style.pointerEvents = 'none';
+        setTimeout(() => { btn.style.display = 'none'; }, 400);
+      }
     });
   </script>
 </body>
