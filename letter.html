@@ -6,148 +6,97 @@
   <title>Your Letter 💖</title>
   <link rel="stylesheet" href="style.css" />
   <style>
-    /* ── Lock screen ── */
-    #lock-screen { transition: opacity .6s ease; }
-    #lock-screen.hidden {
-      opacity: 0;
-      pointer-events: none;
-      position: absolute;
-    }
+    /* lock screen */
+    #lock-screen { transition: opacity .5s ease; }
+    #lock-screen.hidden { opacity: 0; pointer-events: none; position: absolute; }
 
-    .lock-icon {
-      font-size: 3.5rem;
-      margin-bottom: 1rem;
-      animation: heartbeat 2s ease-in-out infinite;
-    }
-    .lock-sub {
-      color: rgba(255,255,255,.5);
-      font-size: .9rem;
-      margin: .4rem 0 1.4rem;
-    }
+    .lock-icon { font-size: 2.8rem; margin-bottom: .8rem; }
+    .lock-sub  { color: var(--text-soft); font-size: .88rem; margin: .3rem 0 1.2rem; }
 
-    .pw-row {
-      display: flex;
-      gap: .8rem;
-      margin-top: .6rem;
-    }
+    .pw-row { display: flex; gap: .7rem; margin-top: .5rem; }
 
-    #pw-error {
-      color: #ff7e7e;
-      font-size: .9rem;
-      min-height: 1.2rem;
-      margin-top: .5rem;
-    }
+    #pw-error { color: #e08090; font-size: .85rem; min-height: 1.1rem; margin-top: .5rem; }
 
-    /* ── Letter reveal ── */
-    #letter-screen {
-      display: none;
-      max-width: 680px;
-      width: 100%;
-    }
+    /* letter */
+    #letter-screen { display: none; max-width: 600px; width: 100%; }
     #letter-screen.show {
       display: flex;
       flex-direction: column;
       align-items: center;
-      animation: fadeUp .9s ease both;
+      animation: fadeUp .8s ease both;
     }
 
     .letter-card {
-      background: rgba(255,245,247,.07);
-      border: 1px solid rgba(255,200,215,.18);
-      border-radius: 20px;
-      padding: clamp(1.8rem, 5vw, 3rem) clamp(1.6rem, 5vw, 3.2rem);
-      max-width: 640px;
-      width: 100%;
+      background: #fff;
+      border: 1.5px solid #f5d0da;
+      border-radius: 18px;
+      padding: clamp(1.8rem, 5vw, 2.8rem) clamp(1.6rem, 5vw, 3rem);
       text-align: left;
-      backdrop-filter: blur(14px);
-      box-shadow: 0 8px 48px rgba(0,0,0,.45);
-      position: relative;
-      overflow: hidden;
+      box-shadow: 0 4px 24px rgba(194,116,138,.1);
+      width: 100%;
     }
-
-    /* decorative corner hearts */
-    .letter-card::before,
-    .letter-card::after {
-      content: '❤';
-      position: absolute;
-      font-size: 5rem;
-      opacity: .04;
-      color: var(--rose);
-    }
-    .letter-card::before { top: -1rem; right: -1rem; }
-    .letter-card::after  { bottom: -1rem; left: -1rem; }
 
     .letter-date {
-      font-size: .8rem;
-      color: rgba(255,255,255,.35);
+      font-size: .75rem;
+      color: #c0a0a8;
       letter-spacing: 1px;
       margin-bottom: 1.2rem;
     }
-
     .letter-salutation {
       font-family: 'Dancing Script', cursive;
-      font-size: clamp(1.5rem, 4vw, 2rem);
-      color: var(--pink);
+      font-size: clamp(1.3rem, 3.5vw, 1.8rem);
+      color: var(--pink-dark);
       margin-bottom: 1rem;
     }
-
     .letter-body {
-      font-size: clamp(.95rem, 2.5vw, 1.05rem);
-      line-height: 1.9;
-      color: rgba(255,245,247,.88);
+      font-size: clamp(.93rem, 2.4vw, 1.02rem);
+      line-height: 1.95;
+      color: var(--text);
       white-space: pre-wrap;
-      font-family: 'Lato', sans-serif;
     }
-
     .letter-closing {
       font-family: 'Dancing Script', cursive;
-      font-size: clamp(1.3rem, 3.5vw, 1.7rem);
-      color: var(--pink);
-      margin-top: 1.6rem;
+      font-size: clamp(1.2rem, 3vw, 1.6rem);
+      color: var(--pink-dark);
+      margin-top: 1.5rem;
       text-align: right;
     }
 
-    /* falling petals */
+    /* petals */
     .petal {
       position: fixed;
-      top: -40px;
-      font-size: 1.2rem;
+      top: -30px;
+      font-size: 1.1rem;
       animation: fall linear infinite;
       pointer-events: none;
       z-index: 0;
-      user-select: none;
     }
-    @keyframes fall {
-      to { transform: translateY(110vh) rotate(360deg); }
-    }
+    @keyframes fall { to { transform: translateY(110vh) rotate(360deg); } }
 
-    /* back link */
-    .back-hint {
+    .back-link {
       position: fixed;
-      top: 1rem; left: 50%;
-      transform: translateX(-50%);
-      font-size: .85rem;
-      color: rgba(255,255,255,.3);
+      top: 1rem; left: 1.2rem;
+      font-size: .82rem;
+      color: #d0a0b0;
+      text-decoration: none;
     }
-    .back-hint a { color: rgba(255,255,255,.35); text-decoration:none; }
-    .back-hint a:hover { color: var(--pink); }
+    .back-link:hover { color: var(--pink-dark); }
   </style>
 </head>
-<body>
-  <canvas id="stars-canvas"></canvas>
-  <p class="back-hint"><a href="quiz.html">← back to questions</a></p>
+<body class="pink-bg">
+  <a class="back-link" href="quiz.html">← back</a>
 
   <div class="page">
 
-    <!-- LOCK SCREEN -->
+    <!-- LOCK -->
     <div id="lock-screen">
-      <div class="card fade-up" style="max-width:420px; width:100%;">
+      <div class="card fade-up" style="max-width:400px; width:100%;">
         <div class="lock-icon">🔐</div>
         <h2>Enter the Password</h2>
-        <p class="lock-sub">You earned it — now type it in!</p>
+        <p class="lock-sub">You earned it — type it in to open the letter.</p>
         <div class="pw-row">
           <input type="text" id="pw-input"
-                 placeholder="e.g. LOVE IS FOREVER"
+                 placeholder="RAK MHU AUAN"
                  autocomplete="off"
                  style="text-transform:uppercase; letter-spacing:2px;" />
           <button class="btn" onclick="tryUnlock()">✓</button>
@@ -156,99 +105,60 @@
       </div>
     </div>
 
-    <!-- LETTER SCREEN (hidden until unlocked) -->
+    <!-- LETTER -->
     <div id="letter-screen">
-      <div style="font-size:2.5rem; margin-bottom:.6rem;" class="heart-pulse">💌</div>
-      <h1 style="margin-bottom:1.6rem;">Your Letter</h1>
+      <p style="font-size:2rem; margin-bottom:.5rem;">💌</p>
+      <h1 style="margin-bottom:1.4rem;">For You</h1>
 
-      <div class="letter-card">
+      <div class="letter-card" style="position:relative; z-index:1;">
         <p class="letter-date" id="letter-date"></p>
 
-        <!-- ════════════════════════════════════════════
-             SALUTATION — edit below
-             ════════════════════════════════════════════ -->
+        <!-- ✏️ Change salutation -->
         <p class="letter-salutation">My dearest [Her Name],</p>
 
-        <!-- ════════════════════════════════════════════
-             LETTER BODY — replace this with your words
-             ════════════════════════════════════════════ -->
-        <div class="letter-body" id="letter-body">
-[ ✏️  Replace this with your love letter! ]
+        <!-- ✏️ Replace with your letter -->
+        <div class="letter-body">[ Write your letter here. ]
 
 I wasn't sure how to say all of this out loud,
 so I built you a little world to find it in.
 
-Every line of this page is a small piece of how
-much you mean to me. You make ordinary moments
+Every line here is a small piece of how much
+you mean to me. You make ordinary moments
 feel like something worth remembering.
 
-Thank you for being exactly who you are —
-for your laugh, your patience, your warmth,
-and for always making me feel at home.
+Thank you for being exactly who you are.
 
 I love you more than I know how to write.
-But I tried, and I hope you feel it.
-        </div>
+But I tried, and I hope you feel it.</div>
 
-        <!-- ════════════════════════════════════════════
-             CLOSING — edit below
-             ════════════════════════════════════════════ -->
+        <!-- ✏️ Change closing -->
         <p class="letter-closing">Always yours, [Your Name] 🌹</p>
       </div>
 
-      <div style="margin-top:2rem;">
+      <div style="margin-top:1.6rem;">
         <a href="index.html" class="btn-ghost">← back to the beginning</a>
       </div>
     </div>
 
-  </div><!-- /page -->
+  </div>
 
   <script>
-    /* ── Starfield ── */
-    (function(){
-      const c=document.getElementById('stars-canvas'),ctx=c.getContext('2d');
-      let stars=[];
-      function resize(){
-        c.width=window.innerWidth; c.height=window.innerHeight;
-        stars=Array.from({length:150},()=>({
-          x:Math.random()*c.width, y:Math.random()*c.height,
-          r:Math.random()*1.6+.3,  a:Math.random(),
-          speed:Math.random()*.008+.003
-        }));
-      }
-      function draw(){
-        ctx.clearRect(0,0,c.width,c.height);
-        stars.forEach(s=>{
-          s.a+=s.speed;
-          const alpha=.35+.6*Math.abs(Math.sin(s.a));
-          ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
-          ctx.fillStyle=`rgba(255,230,240,${alpha})`; ctx.fill();
-        });
-        requestAnimationFrame(draw);
-      }
-      resize(); window.addEventListener('resize',resize); draw();
-    })();
-
-    /* ── Auto-fill from quiz if available ── */
+    // Auto-fill password from quiz page if available
     const saved = sessionStorage.getItem('ltr_pw');
-    if (saved) {
-      document.getElementById('pw-input').value = saved;
-    }
+    if (saved) document.getElementById('pw-input').value = saved;
 
-    /* ── Password check ── */
-    // The correct password is the three fragments joined by a space
-    // It must match what you set in quiz.html → QUESTIONS[i].fragment
-    const CORRECT_PASSWORD = 'LOVE IS FOREVER'; // ← update if you change fragments
+    // ✏️ Must match the fragments in quiz.html joined by spaces
+    const CORRECT = 'RAK MHU AUAN';
 
     function tryUnlock() {
       const entered = document.getElementById('pw-input').value.trim().toUpperCase();
-      if (entered === CORRECT_PASSWORD.toUpperCase()) {
-        unlockLetter();
+      if (entered === CORRECT) {
+        unlock();
       } else {
         const err = document.getElementById('pw-error');
-        err.textContent = '❌ That doesn't seem right… try again!';
+        err.textContent = 'That doesn\'t seem right — try again.';
         document.getElementById('pw-input').classList.add('shake');
-        setTimeout(()=> document.getElementById('pw-input').classList.remove('shake'), 400);
+        setTimeout(() => document.getElementById('pw-input').classList.remove('shake'), 400);
       }
     }
 
@@ -256,48 +166,34 @@ But I tried, and I hope you feel it.
       if (e.key === 'Enter') tryUnlock();
     });
 
-    function unlockLetter() {
-      // set today's date on the letter
+    function unlock() {
       const now  = new Date();
-      const opts = { year:'numeric', month:'long', day:'numeric' };
-      document.getElementById('letter-date').textContent = now.toLocaleDateString('en-US', opts);
+      document.getElementById('letter-date').textContent =
+        now.toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
 
-      // hide lock, show letter
-      const lock   = document.getElementById('lock-screen');
-      const letter = document.getElementById('letter-screen');
+      const lock = document.getElementById('lock-screen');
       lock.classList.add('hidden');
       setTimeout(() => {
         lock.style.display = 'none';
-        letter.classList.add('show');
+        document.getElementById('letter-screen').classList.add('show');
         spawnPetals();
-      }, 650);
+      }, 550);
     }
 
-    /* ── Falling petals ── */
     function spawnPetals() {
-      const symbols = ['🌸','🌺','🌹','💕','✨','🌷'];
-      for (let i = 0; i < 22; i++) {
+      const symbols = ['🌸','🌷','💗','✿','🌺'];
+      for (let i = 0; i < 18; i++) {
         const p = document.createElement('div');
         p.className = 'petal';
-        p.textContent = symbols[Math.floor(Math.random()*symbols.length)];
-        p.style.left     = Math.random()*100 + 'vw';
-        p.style.fontSize = (Math.random()*.8+.8) + 'rem';
-        const dur        = Math.random()*6+5;
-        const delay      = Math.random()*8;
+        p.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+        p.style.left = Math.random() * 100 + 'vw';
+        p.style.fontSize = (Math.random() * .6 + .8) + 'rem';
+        const dur = Math.random() * 5 + 6;
         p.style.animationDuration = dur + 's';
-        p.style.animationDelay   = delay + 's';
+        p.style.animationDelay   = Math.random() * 6 + 's';
         document.body.appendChild(p);
       }
     }
-
-    /* ── Shake animation ── */
-    const style = document.createElement('style');
-    style.textContent=`
-      @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}
-      40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
-      .shake{animation:shake .35s ease;}
-    `;
-    document.head.appendChild(style);
   </script>
 </body>
 </html>
