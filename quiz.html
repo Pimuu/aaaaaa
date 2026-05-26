@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Unlock the Letter 🔑</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* ── Quiz specific ── */
+    .quiz-wrap {
+      max-width: 600px;
+      width: 100%;
+    }
+
+    /* progress dots */
+    .progress {
+      display: flex;
+      gap: .7rem;
+      justify-content: center;
+      margin-bottom: 1.8rem;
+    }
+    .dot {
+      width: 12px; height: 12px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.2);
+      border: 2px solid rgba(255,255,255,.3);
+      transition: background .4s, border-color .4s;
+    }
+    .dot.done  { background: var(--rose); border-color: var(--rose); }
+    .dot.active { background: var(--gold); border-color: var(--gold); }
+
+    /* question card */
+    .q-card {
+      display: none;
+      animation: fadeUp .5s ease both;
+    }
+    .q-card.active { display: block; }
+
+    .q-number {
+      font-size: .8rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.4);
+      margin-bottom: .5rem;
+    }
+    .q-text {
+      font-family: 'Dancing Script', cursive;
+      font-size: clamp(1.3rem, 3.5vw, 1.9rem);
+      color: var(--pink);
+      margin-bottom: 1.4rem;
+      line-height: 1.4;
+    }
+
+    .input-row {
+      display: flex;
+      gap: .8rem;
+      align-items: center;
+    }
+    .input-row input { flex: 1; }
+
+    .feedback {
+      margin-top: .8rem;
+      font-size: .95rem;
+      min-height: 1.3rem;
+      transition: opacity .3s;
+    }
+    .feedback.correct { color: #7cffb2; }
+    .feedback.wrong   { color: #ff7e7e; }
+
+    /* revealed password fragment */
+    .fragment {
+      display: inline-block;
+      background: rgba(249,215,126,.15);
+      border: 1px solid rgba(249,215,126,.4);
+      border-radius: 10px;
+      padding: .3em .9em;
+      font-family: 'Dancing Script', cursive;
+      font-size: 1.4rem;
+      color: var(--gold);
+      letter-spacing: 2px;
+      margin-top: .7rem;
+      animation: fadeUp .4s ease both;
+    }
+
+    /* final reveal box */
+    #final-reveal {
+      display: none;
+      animation: fadeUp .7s ease both;
+    }
+    .password-box {
+      background: rgba(249,215,126,.12);
+      border: 2px solid var(--gold);
+      border-radius: 16px;
+      padding: 1.4rem 2rem;
+      margin: 1.2rem 0;
+      font-family: 'Dancing Script', cursive;
+      font-size: 2rem;
+      color: var(--gold);
+      letter-spacing: 6px;
+      word-break: break-all;
+      text-shadow: 0 0 18px rgba(249,215,126,.5);
+    }
+    .password-label {
+      font-size: .85rem;
+      color: rgba(255,255,255,.5);
+      margin-bottom: .4rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+    }
+
+    /* hint bar at top */
+    .back-hint {
+      position: fixed;
+      top: 1rem; left: 50%;
+      transform: translateX(-50%);
+      font-size: .85rem;
+      color: rgba(255,255,255,.3);
+    }
+    .back-hint a { color: rgba(255,255,255,.4); text-decoration: none; }
+    .back-hint a:hover { color: var(--pink); }
+  </style>
+</head>
+<body>
+  <canvas id="stars-canvas"></canvas>
+  <p class="back-hint"><a href="index.html">← back</a></p>
+
+  <div class="page">
+    <div class="quiz-wrap">
+      <h1 class="fade-up">Prove you know me 🗝️</h1>
+      <p class="fade-up-delay" style="color:rgba(255,255,255,.55); margin-bottom:1.8rem;">
+        Answer correctly to collect the pieces of the password.
+      </p>
+
+      <!-- Progress dots -->
+      <div class="progress" id="progress">
+        <div class="dot active" id="d0"></div>
+        <div class="dot"       id="d1"></div>
+        <div class="dot"       id="d2"></div>
+      </div>
+
+      <!-- ════════════════════════════════════
+           QUESTION 1
+           ════════════════════════════════════ -->
+      <div class="card q-card active" id="q0">
+        <p class="q-number">Question 1 of 3</p>
+        <p class="q-text">"Where did we first meet each other?" 🌸</p>
+        <div class="input-row">
+          <input type="text" id="a0" placeholder="your answer…" autocomplete="off" />
+          <button class="btn" onclick="checkAnswer(0)">→</button>
+        </div>
+        <p class="feedback" id="f0"></p>
+        <div id="frag0"></div>
+      </div>
+
+      <!-- ════════════════════════════════════
+           QUESTION 2
+           ════════════════════════════════════ -->
+      <div class="card q-card" id="q1">
+        <p class="q-number">Question 2 of 3</p>
+        <p class="q-text">"What is my favorite color?" 🎨</p>
+        <div class="input-row">
+          <input type="text" id="a1" placeholder="your answer…" autocomplete="off" />
+          <button class="btn" onclick="checkAnswer(1)">→</button>
+        </div>
+        <p class="feedback" id="f1"></p>
+        <div id="frag1"></div>
+      </div>
+
+      <!-- ════════════════════════════════════
+           QUESTION 3
+           ════════════════════════════════════ -->
+      <div class="card q-card" id="q2">
+        <p class="q-number">Question 3 of 3</p>
+        <p class="q-text">"What do I always say before we say goodnight?" 🌙</p>
+        <div class="input-row">
+          <input type="text" id="a2" placeholder="your answer…" autocomplete="off" />
+          <button class="btn" onclick="checkAnswer(2)">→</button>
+        </div>
+        <p class="feedback" id="f2"></p>
+        <div id="frag2"></div>
+      </div>
+
+      <!-- ════════════════════════════════════
+           FINAL REVEAL
+           ════════════════════════════════════ -->
+      <div id="final-reveal" class="card">
+        <p style="font-size:1.8rem; margin-bottom:.4rem;">🎉</p>
+        <h2>You know me so well!</h2>
+        <p style="color:rgba(255,255,255,.6); margin:.6rem 0 1rem;">
+          Here is your password to open the letter:
+        </p>
+        <p class="password-label">Your password</p>
+        <div class="password-box" id="full-password">— — —</div>
+        <p style="font-size:.85rem; color:rgba(255,255,255,.4); margin-bottom:1.4rem;">
+          Copy it and use it on the next page 💌
+        </p>
+        <a href="letter.html" class="btn">Open the Letter 💖</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ── Starfield ── */
+    (function(){
+      const c   = document.getElementById('stars-canvas');
+      const ctx = c.getContext('2d');
+      let stars = [];
+      function resize(){
+        c.width  = window.innerWidth;
+        c.height = window.innerHeight;
+        stars = Array.from({length:140}, ()=>({
+          x:Math.random()*c.width, y:Math.random()*c.height,
+          r:Math.random()*1.5+.3,  a:Math.random(),
+          speed:Math.random()*.008+.003
+        }));
+      }
+      function draw(){
+        ctx.clearRect(0,0,c.width,c.height);
+        stars.forEach(s=>{
+          s.a+=s.speed;
+          const alpha=.35+.6*Math.abs(Math.sin(s.a));
+          ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+          ctx.fillStyle=`rgba(255,230,240,${alpha})`; ctx.fill();
+        });
+        requestAnimationFrame(draw);
+      }
+      resize(); window.addEventListener('resize',resize); draw();
+    })();
+
+    /* ════════════════════════════════════════════════════
+       QUIZ DATA
+       ── Edit the answers and password fragments here ──
+       answers  : accepted answers (case-insensitive, trimmed)
+       fragment : the password piece revealed on correct answer
+       You can add multiple accepted answers per question.
+    ════════════════════════════════════════════════════ */
+    const QUESTIONS = [
+      {
+        answers:  ['PUT YOUR ANSWER HERE'],   // e.g. ['school', 'at school', 'university']
+        fragment: 'LOVE',                      // part 1 of password
+        hint:     '✨ That's where our story began!'
+      },
+      {
+        answers:  ['PUT YOUR ANSWER HERE'],   // e.g. ['blue', 'sky blue']
+        fragment: 'IS',                        // part 2 of password
+        hint:     '🎨 Yep, that's definitely my color!'
+      },
+      {
+        answers:  ['PUT YOUR ANSWER HERE'],   // e.g. ['sweet dreams', 'i love you']
+        fragment: 'FOREVER',                   // part 3 of password
+        hint:     '🌙 You always remember the little things!'
+      }
+    ];
+    // Full password = fragments joined by space  →  "LOVE IS FOREVER"
+    // Change fragments above to change the password.
+
+    let current = 0;
+    const collected = [];
+
+    function checkAnswer(idx) {
+      const input    = document.getElementById(`a${idx}`);
+      const feedback = document.getElementById(`f${idx}`);
+      const fragEl   = document.getElementById(`frag${idx}`);
+      const raw      = input.value.trim().toLowerCase();
+
+      const q        = QUESTIONS[idx];
+      const accepted = q.answers.map(a => a.toLowerCase());
+
+      if (!raw) return;
+
+      if (accepted.includes(raw)) {
+        feedback.textContent  = q.hint;
+        feedback.className    = 'feedback correct';
+        fragEl.innerHTML      = `<div class="fragment">✦ ${q.fragment} ✦</div>`;
+        collected[idx]        = q.fragment;
+        input.disabled        = true;
+
+        // advance after short pause
+        setTimeout(() => nextQuestion(idx), 1100);
+      } else {
+        feedback.textContent  = '❌ Hmm, try again…';
+        feedback.className    = 'feedback wrong';
+        input.classList.add('shake');
+        setTimeout(()=> input.classList.remove('shake'), 400);
+      }
+    }
+
+    // allow Enter key
+    document.querySelectorAll('input').forEach((inp, i) => {
+      inp.addEventListener('keydown', e => {
+        if (e.key === 'Enter') checkAnswer(i);
+      });
+    });
+
+    function nextQuestion(done) {
+      // mark dot done
+      document.getElementById(`d${done}`).classList.remove('active');
+      document.getElementById(`d${done}`).classList.add('done');
+
+      const next = done + 1;
+      if (next < QUESTIONS.length) {
+        document.getElementById(`q${done}`).classList.remove('active');
+        document.getElementById(`q${next}`).classList.add('active');
+        document.getElementById(`d${next}`).classList.add('active');
+        document.getElementById(`a${next}`).focus();
+      } else {
+        // all done — show final reveal
+        document.getElementById(`q${done}`).classList.remove('active');
+        const password = collected.join(' ');
+        document.getElementById('full-password').textContent = password;
+        // store for letter page
+        sessionStorage.setItem('ltr_pw', password);
+        document.getElementById('final-reveal').style.display = 'block';
+      }
+    }
+
+    // shake animation
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes shake {
+        0%,100%{transform:translateX(0)}
+        20%{transform:translateX(-6px)}
+        40%{transform:translateX(6px)}
+        60%{transform:translateX(-4px)}
+        80%{transform:translateX(4px)}
+      }
+      .shake { animation: shake .35s ease; }
+    `;
+    document.head.appendChild(style);
+  </script>
+</body>
+</html>

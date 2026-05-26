@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>A Letter For You 💌</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* ── Envelope SVG animation ── */
+    .envelope-wrap {
+      position: relative;
+      width: min(280px, 72vw);
+      margin: 0 auto 2rem;
+      filter: drop-shadow(0 0 32px rgba(232,81,122,.45));
+      animation: floatEnv 3.6s ease-in-out infinite;
+      cursor: default;
+      user-select: none;
+    }
+    @keyframes floatEnv {
+      0%,100% { transform: translateY(0); }
+      50%      { transform: translateY(-14px); }
+    }
+    .envelope-wrap svg { width: 100%; height: auto; }
+
+    /* flap open animation when btn clicked */
+    .envelope-wrap.peek .flap {
+      animation: flapOpen .5s ease forwards;
+      transform-origin: top center;
+    }
+    @keyframes flapOpen {
+      to { transform: rotateX(160deg); }
+    }
+
+    /* ── Shrinking button ── */
+    #open-btn {
+      transform-origin: center;
+      transition: font-size .3s ease, padding .3s ease, opacity .4s ease;
+      white-space: nowrap;
+      position: relative;
+    }
+
+    /* ── Hint ── */
+    #hint {
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 1s ease;
+      margin-top: 1.4rem;
+      font-family: 'Dancing Script', cursive;
+      font-size: 1.15rem;
+      color: var(--gold);
+      text-shadow: 0 0 12px rgba(249,215,126,.5);
+    }
+    #hint.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    #hint a {
+      color: var(--gold);
+      font-size: 1.3rem;
+      font-weight: 700;
+      text-decoration: underline dotted;
+      cursor: pointer;
+    }
+
+    /* subtitle */
+    .subtitle {
+      font-size: .95rem;
+      color: rgba(255,255,255,.45);
+      margin-top: .5rem;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="stars-canvas"></canvas>
+
+  <div class="page">
+    <h1 class="fade-up">Something for you 💌</h1>
+    <p class="subtitle fade-up-delay">— a little something I've been meaning to give you —</p>
+
+    <div class="divider fade-up-delay"></div>
+
+    <!-- Envelope SVG -->
+    <div class="envelope-wrap fade-up-delay" id="envelope">
+      <svg viewBox="0 0 280 200" xmlns="http://www.w3.org/2000/svg">
+        <!-- envelope body -->
+        <rect x="4" y="30" width="272" height="166" rx="10" ry="10"
+              fill="#fff5f7" stroke="#2a0a1a" stroke-width="5"/>
+        <!-- flap (triangle) -->
+        <polygon class="flap" points="4,30 140,130 276,30"
+                 fill="#ffe0ec" stroke="#2a0a1a" stroke-width="4"
+                 style="transform-box:fill-box;"/>
+        <!-- bottom fold lines -->
+        <line x1="4"  y1="196" x2="140" y2="105" stroke="#d4b0bb" stroke-width="2.5"/>
+        <line x1="276" y1="196" x2="140" y2="105" stroke="#d4b0bb" stroke-width="2.5"/>
+        <!-- heart -->
+        <g transform="translate(140,115)">
+          <path d="M0,10 C0,10 -28,-10 -28,-30 C-28,-48 -14,-56 0,-44 C14,-56 28,-48 28,-30 C28,-10 0,10 0,10 Z"
+                fill="#e8517a" stroke="#2a0a1a" stroke-width="3.5"
+                stroke-linejoin="round"/>
+        </g>
+        <!-- sparkles -->
+        <text x="36"  y="78"  font-size="18" fill="#f9d77e" opacity=".75">✦</text>
+        <text x="228" y="70"  font-size="14" fill="#f9d77e" opacity=".6">✦</text>
+        <text x="58"  y="160" font-size="11" fill="#f9d77e" opacity=".5">✦</text>
+        <text x="210" y="162" font-size="16" fill="#f9d77e" opacity=".65">✦</text>
+      </svg>
+    </div>
+
+    <!-- Shrinking open button -->
+    <button class="btn" id="open-btn">Open Me 💝</button>
+
+    <!-- Hint that appears when button is nearly gone -->
+    <p id="hint">
+      Psst… can't find the button? 👀<br/>
+      Maybe try <a href="quiz.html">answering a few questions</a> instead ✨
+    </p>
+  </div>
+
+  <script>
+    /* ── Starfield ── */
+    (function(){
+      const c = document.getElementById('stars-canvas');
+      const ctx = c.getContext('2d');
+      let stars = [];
+      function resize(){
+        c.width  = window.innerWidth;
+        c.height = window.innerHeight;
+        stars = Array.from({length:160}, ()=>({
+          x: Math.random()*c.width,
+          y: Math.random()*c.height,
+          r: Math.random()*1.6+.3,
+          a: Math.random(),
+          speed: Math.random()*.008+.003
+        }));
+      }
+      function draw(){
+        ctx.clearRect(0,0,c.width,c.height);
+        stars.forEach(s=>{
+          s.a += s.speed;
+          const alpha = .4+.6*Math.abs(Math.sin(s.a));
+          ctx.beginPath();
+          ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+          ctx.fillStyle = `rgba(255,230,240,${alpha})`;
+          ctx.fill();
+        });
+        requestAnimationFrame(draw);
+      }
+      resize();
+      window.addEventListener('resize', resize);
+      draw();
+    })();
+
+    /* ── Shrinking button logic ── */
+    const btn      = document.getElementById('open-btn');
+    const envelope = document.getElementById('envelope');
+    const hint     = document.getElementById('hint');
+
+    // Starting size values (px / em)
+    let fontSize = 1.4;      // rem
+    let padV     = 0.7;      // em
+    let padH     = 2.0;      // em
+    let clicks   = 0;
+    const MAX_CLICKS = 10;   // clicks before button vanishes
+    const HINT_AT    = 7;    // clicks before hint appears
+
+    btn.addEventListener('click', () => {
+      clicks++;
+
+      // little envelope peek
+      envelope.classList.add('peek');
+      setTimeout(()=> envelope.classList.remove('peek'), 600);
+
+      if (clicks >= MAX_CLICKS) {
+        // button invisible & non-interactive
+        btn.style.opacity  = '0';
+        btn.style.pointerEvents = 'none';
+        hint.classList.add('visible');
+        return;
+      }
+
+      // shrink by 14% each click
+      const factor = Math.pow(0.86, clicks);
+      fontSize = 1.4  * factor;
+      padV     = 0.7  * factor;
+      padH     = 2.0  * factor;
+
+      btn.style.fontSize = `${fontSize}rem`;
+      btn.style.padding  = `${padV}em ${padH}em`;
+
+      // show hint near the end
+      if (clicks >= HINT_AT) {
+        hint.classList.add('visible');
+      }
+    });
+  </script>
+</body>
+</html>

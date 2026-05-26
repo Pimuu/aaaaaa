@@ -1,0 +1,149 @@
+/* ===== SHARED ROMANTIC STYLES ===== */
+@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;600;700&family=Lato:wght@300;400&display=swap');
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --rose:    #e8517a;
+  --pink:    #f7a8c0;
+  --cream:   #fff5f7;
+  --gold:    #f9d77e;
+  --dark:    #12061f;
+  --deeper:  #1c0a30;
+  --text:    #f9e8f0;
+}
+
+body {
+  background: radial-gradient(ellipse at top, var(--deeper) 0%, var(--dark) 100%);
+  min-height: 100vh;
+  font-family: 'Lato', sans-serif;
+  color: var(--text);
+  overflow-x: hidden;
+}
+
+/* ── Stars ── */
+#stars-canvas {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── Shared page wrapper ── */
+.page {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 2rem;
+  text-align: center;
+}
+
+/* ── Headings ── */
+h1, h2, .script {
+  font-family: 'Dancing Script', cursive;
+  color: var(--pink);
+  text-shadow: 0 0 18px rgba(232, 81, 122, 0.55);
+}
+
+h1 { font-size: clamp(2rem, 6vw, 3.8rem); margin-bottom: .4rem; }
+h2 { font-size: clamp(1.4rem, 4vw, 2.4rem); margin-bottom: 1.2rem; }
+
+/* ── Glassmorphism card ── */
+.card {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 20px;
+  backdrop-filter: blur(12px);
+  padding: 2.5rem 3rem;
+  max-width: 560px;
+  width: 100%;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.4);
+}
+
+/* ── Buttons ── */
+.btn {
+  display: inline-block;
+  font-family: 'Dancing Script', cursive;
+  font-size: 1.4rem;
+  font-weight: 600;
+  background: linear-gradient(135deg, var(--rose), #c0365a);
+  color: #fff;
+  border: none;
+  border-radius: 50px;
+  padding: .7em 2em;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(232, 81, 122, 0.5);
+  transition: transform .15s ease, box-shadow .15s ease;
+  text-decoration: none;
+}
+.btn:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(232,81,122,.65); }
+.btn:active { transform: translateY(0); }
+
+.btn-ghost {
+  background: transparent;
+  border: 2px solid var(--rose);
+  color: var(--pink);
+  font-family: 'Dancing Script', cursive;
+  font-size: 1.1rem;
+  border-radius: 50px;
+  padding: .5em 1.6em;
+  cursor: pointer;
+  transition: background .2s;
+  text-decoration: none;
+  display: inline-block;
+}
+.btn-ghost:hover { background: rgba(232,81,122,.15); }
+
+/* ── Input ── */
+input[type="text"],
+input[type="password"] {
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.25);
+  border-radius: 12px;
+  color: #fff;
+  font-family: 'Lato', sans-serif;
+  font-size: 1rem;
+  padding: .7rem 1.2rem;
+  width: 100%;
+  outline: none;
+  transition: border-color .2s;
+}
+input::placeholder { color: rgba(255,255,255,0.4); }
+input:focus { border-color: var(--rose); }
+
+/* ── Divider ── */
+.divider {
+  width: 60px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--rose), transparent);
+  margin: 1.2rem auto;
+}
+
+/* ── Heart pulse ── */
+@keyframes heartbeat {
+  0%,100% { transform: scale(1); }
+  14%      { transform: scale(1.15); }
+  28%      { transform: scale(1); }
+  42%      { transform: scale(1.12); }
+  70%      { transform: scale(1); }
+}
+.heart-pulse { animation: heartbeat 2s ease-in-out infinite; display: inline-block; }
+
+/* ── Fade in ── */
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(24px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+.fade-up { animation: fadeUp .7s ease both; }
+.fade-up-delay { animation: fadeUp .7s .35s ease both; }
+.fade-up-delay2 { animation: fadeUp .7s .65s ease both; }
+
+/* ── Stars JS canvas helper (drawn by script) ── */
